@@ -71,7 +71,6 @@ async fn main() -> Result<()> {
         let req: RpcRequest = match serde_json::from_str(trimmed) {
             Ok(v) => v,
             Err(e) => {
-                // If we can’t parse, emit a JSON-RPC error without id.
                 let resp = RpcResponse {
                     jsonrpc: "2.0",
                     id: None,
@@ -229,11 +228,9 @@ async fn tool_unshare_exec(params: &serde_json::Value, root: &Path) -> Result<se
         .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>())
         .unwrap_or_default();
 
-    // Optional: map working directory under root
     let cwd = root.join("sandbox");
     tokio::fs::create_dir_all(&cwd).await?;
 
-    // Spawn unshare command
     let output = std::process::Command::new("unshare")
         .arg("--uts")
         .arg("--ipc")
